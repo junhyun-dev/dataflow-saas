@@ -5,14 +5,14 @@
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  🎯 현재 단계: Part 1 - E2E 하드코딩                        │
-│  📍 현재 위치: Session 2 완료 (Collect → Load)               │
-│  📊 전체 진행률: Part 1: 2/5, Part 2: 0/5, Part 3: 0/3     │
+│  📍 현재 위치: Session 3-4 완료 (Transform + Serve)           │
+│  📊 전체 진행률: Part 1: 4/5, Part 2: 0/5, Part 3: 0/3     │
 │                                                             │
-│  Part 1 ████░░░░░░░░░░░░░░░░ 40%  (E2E 하드코딩)           │
+│  Part 1 ████████░░░░░░░░░░░░ 80%  (E2E 하드코딩)           │
 │  Part 2 ░░░░░░░░░░░░░░░░░░░░ 0%   (Airflow + 확장)         │
 │  Part 3 ░░░░░░░░░░░░░░░░░░░░ 0%   (운영 품질)              │
 │                                                             │
-│  다음 할 일: Session 3 — Transform (SQL 모델)                │
+│  다음 할 일: Session 5 — E2E 수동 실행 → 문제 발견           │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -24,7 +24,7 @@
 4단계로 시작, 진화형 아키텍처:
 
 Collect → Load → Transform(SQL) → Serve(API)
-  ✅       ✅       🔲              🔲
+  ✅       ✅       ✅              ✅
 
 구현 순서:
 1. E2E 하드코딩 (commits → DuckDB → mart → API)  ← 지금 여기
@@ -45,6 +45,10 @@ Collect → Load → Transform(SQL) → Serve(API)
 | storage/warehouse | ✅ 동작 | DuckDB, raw 스키마 재설계 완료 |
 | pipeline/github_loader | ✅ 동작 | JSON→DuckDB 적재, 메타데이터 |
 | pipeline/run_collect_load | ✅ 동작 | E2E 원커맨드 실행 스크립트 |
+| pipeline/run_pipeline | ✅ 동작 | Collect→Load→Transform 전체 E2E |
+| transform/sql_runner | ✅ 동작 | SQL 모델 순서 실행기 |
+| transform/models/ | ✅ 동작 | 5개 SQL 모델 (stg→int→mart) |
+| visualization/chart-api | ✅ 동작 | FastAPI, mart→JSON 서빙 |
 
 ---
 
@@ -54,9 +58,9 @@ Collect → Load → Transform(SQL) → Serve(API)
 |---------|------|------|
 | **S1** | 전체 아키텍처 + 기존 코드 리뷰 | ✅ 완료 (2026-03-21) |
 | **S2** | E2E: Collect → Load | ✅ 완료 (2026-03-22) |
-| **S3** | E2E: Transform (SQL 모델) | ⬜ 다음 |
-| S4 | E2E: Serve (FastAPI) | ⬜ |
-| S5 | E2E 수동 실행 → 문제 발견 | ⬜ |
+| **S3** | E2E: Transform (SQL 모델) | ✅ 완료 (2026-03-22) |
+| **S4** | E2E: Serve (FastAPI) | ✅ 완료 (2026-03-22) |
+| **S5** | E2E 수동 실행 → 문제 발견 | ⬜ 다음 |
 | S6-7 | Airflow DAG | ⬜ |
 | S8 | Config-driven 리팩토링 | ⬜ |
 | S9-10 | SQL 모델 확장 + 증분 처리 | ⬜ |
@@ -110,6 +114,17 @@ Collect → Load → Transform(SQL) → Serve(API)
 - Collector 출력과 raw 스키마 1:1 매칭이 중요 (이전 스키마는 임의로 만들어서 불일치)
 - TIMESTAMP 자동 캐스팅: ISO 8601 문자열 → DuckDB가 알아서 변환
 
+- [x] Session 3: Transform SQL 모델
+  - SQL 5개: stg_commits, stg_pull_requests, int_commit_daily, int_pr_metrics, mart_developer_weekly
+  - staging=View, intermediate/mart=Table (CREATE OR REPLACE)
+  - mart에서 commits+PRs FULL JOIN (회사 CO005 패턴)
+  - sql_runner.py: 의존성 순서대로 실행
+
+- [x] Session 4: Serve (FastAPI)
+  - `GET /api/v1/developer/weekly`: mart_developer_weekly JSON 서빙
+  - `GET /api/v1/tables`: 테이블 목록 + 행 수
+  - E2E 최초 관통 완료: Collect → Load → Transform → Serve
+
 ---
 
 ## 변경 이력
@@ -121,3 +136,4 @@ Collect → Load → Transform(SQL) → Serve(API)
 | 2026-03-03 | ingestion/collector 기본 완료, 통합 테스트, ADR 3개 |
 | 2026-03-21 | Session 1 완료: 아키텍처 재설계 (ADR 005), LEARNING_PLAN 재편 |
 | 2026-03-22 | Session 2 완료: Collect→Load 연결, raw 스키마 재설계, E2E 스크립트 |
+| 2026-03-22 | Session 3-4 완료: Transform SQL 모델 + FastAPI Serve → E2E 관통 |

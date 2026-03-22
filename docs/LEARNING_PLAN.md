@@ -28,22 +28,22 @@
 - **학습 포인트**: collector 출력↔스키마 1:1 매칭, DuckDB JSON 타입, TIMESTAMP 자동 캐스팅
 - [x] 완료 (2026-03-22)
 
-### Session 3: E2E 하드코딩 — Transform (SQL 모델)
+### Session 3: E2E 하드코딩 — Transform (SQL 모델) ✅
 - **타입**: Build
-- **범위**: DuckDB 위에 staging → intermediate → mart → report SQL 모델
+- **범위**: DuckDB 위에 staging → intermediate → mart SQL 모델
 - **SKILL-TREE**: ★ Data Modeling, Medallion Architecture
 - **kb**: Data-Modeling Ch7 (Medallion), Ch8 (dbt 패턴)
-- **핵심 질문**: "stg→int→mart→rpt 각 레이어가 왜 필요한지 직접 체감했나?"
-- **산출물**: SQL 모델 파일들 + `mart_developer_kpi`, `rpt_team_dashboard`
-- [ ] 완료
+- **산출물**: SQL 5개 (stg_commits, stg_pull_requests, int_commit_daily, int_pr_metrics, mart_developer_weekly) + sql_runner.py
+- **학습 포인트**: staging=View vs intermediate/mart=Table, FULL JOIN으로 다중 소스 결합, DATE_TRUNC 레이어간 집계 단위
+- [x] 완료 (2026-03-22)
 
-### Session 4: E2E 하드코딩 — Serve (FastAPI)
+### Session 4: E2E 하드코딩 — Serve (FastAPI) ✅
 - **타입**: Build
-- **범위**: report 테이블 → FastAPI 엔드포인트 → 차트 데이터 응답
+- **범위**: mart 테이블 → FastAPI 엔드포인트 → 차트 데이터 응답
 - **SKILL-TREE**: API 설계
-- **핵심 질문**: "API가 DuckDB를 직접 찌르는 구조의 트레이드오프는?"
-- **산출물**: FastAPI 엔드포인트 + E2E 파이프라인 최초 관통 🎉
-- [ ] 완료
+- **산출물**: chart-api/app.py (GET /api/v1/developer/weekly, /api/v1/tables)
+- **학습 포인트**: DuckDB read_only 모드, 파이프라인 4단계 E2E 최초 관통
+- [x] 완료 (2026-03-22)
 
 ### Session 5: E2E 수동 실행 → 문제 발견
 - **타입**: Dive + Build
