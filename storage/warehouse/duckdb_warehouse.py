@@ -138,6 +138,45 @@ class DuckDBWarehouse(BaseWarehouse):
             result.finish("fail")
             raise InsertionError(f"Failed to insert into '{table}': {e}") from e
 
+    def insert_or_ignore(self, table: str, data: list[dict]) -> InsertResult:
+        """PK 중복 시 무시하고 삽입 (멱등성)"""
+        result = InsertResult(table=table, rows_affected=0, status="pending")
+
+        if not data:
+            return result.finish("success")
+
+        try:
+            columns = list(data[0].keys())
+            placeholders = ", ".join(["?"] * len(columns))
+            cols_str = ", ".join(columns)
+
+            sql = f"INSERT OR IGNORE INTO {table} ({cols_str}) VALUES ({placeholders})"
+
+            before_count = self.conn.execute(
+                f"SELECT COUNT(*) FROM {table}"
+            ).fetchone()[0]
+
+            for row in data:
+                values = [row.get(col) for col in columns]
+                self.conn.execute(sql, values)
+
+            after_count = self.conn.execute(
+                f"SELECT COUNT(*) FROM {table}"
+            ).fetchone()[0]
+
+            result.rows_affected = after_count - before_count
+            skipped = len(data) - result.rows_affected
+            if skipped > 0:
+                logger.info(f"Inserted {result.rows_affected}, skipped {skipped} duplicates into {table}")
+            else:
+                logger.info(f"Inserted {result.rows_affected} rows into {table}")
+            return result.finish("success")
+
+        except duckdb.Error as e:
+            result.add_error(str(e))
+            result.finish("fail")
+            raise InsertionError(f"Failed to insert into '{table}': {e}") from e
+
     def load_parquet(self, table: str, path: Path) -> InsertResult:
         result = InsertResult(table=table, rows_affected=0, status="pending")
 

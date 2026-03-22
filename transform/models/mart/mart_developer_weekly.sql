@@ -6,13 +6,13 @@ CREATE OR REPLACE TABLE mart_developer_weekly AS
 WITH weekly_commits AS (
     SELECT
         DATE_TRUNC('week', commit_date) AS commit_week,
-        author_name AS developer,
+        developer,
         repo_owner,
         repo_name,
         SUM(commit_count) AS total_commits,
         AVG(avg_message_length) AS avg_message_length
     FROM int_commit_daily
-    GROUP BY DATE_TRUNC('week', commit_date), author_name, repo_owner, repo_name
+    GROUP BY DATE_TRUNC('week', commit_date), developer, repo_owner, repo_name
 ),
 weekly_prs AS (
     SELECT

@@ -51,7 +51,7 @@ class GitHubLoader:
         """커밋 JSON → raw_commits 테이블"""
         records = self._read_json(json_path)
         enriched = [self._enrich_commit(r) for r in records]
-        result = self.warehouse.insert("raw_commits", enriched)
+        result = self.warehouse.insert_or_ignore("raw_commits", enriched)
         logger.info(f"Loaded {result.rows_affected} commits")
         return result
 
@@ -59,7 +59,7 @@ class GitHubLoader:
         """PR JSON → raw_pull_requests 테이블"""
         records = self._read_json(json_path)
         enriched = [self._enrich_pr(r) for r in records]
-        result = self.warehouse.insert("raw_pull_requests", enriched)
+        result = self.warehouse.insert_or_ignore("raw_pull_requests", enriched)
         logger.info(f"Loaded {result.rows_affected} pull requests")
         return result
 

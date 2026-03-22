@@ -249,15 +249,20 @@ class GitHubCollector(BaseCollector):
         commit = raw.get("commit", {})
         author = commit.get("author", {})
         committer = commit.get("committer", {})
+        # top-level author/committer는 GitHub user 객체 (login 포함)
+        gh_author = raw.get("author") or {}
+        gh_committer = raw.get("committer") or {}
 
         return {
             "sha": raw.get("sha"),
             "message": commit.get("message"),
             "author_name": author.get("name"),
             "author_email": author.get("email"),
+            "author_login": gh_author.get("login"),
             "author_date": author.get("date"),
             "committer_name": committer.get("name"),
             "committer_email": committer.get("email"),
+            "committer_login": gh_committer.get("login"),
             "committer_date": committer.get("date"),
             "url": raw.get("html_url"),
             "parents": [p.get("sha") for p in raw.get("parents", [])],

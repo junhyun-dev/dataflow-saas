@@ -7,10 +7,13 @@ SELECT
     message,
     author_name,
     author_email,
+    author_login,
     author_date,
     committer_date,
     repo_owner,
     repo_name,
+    -- 파생: PR과 JOIN할 때 사용할 통합 식별자
+    COALESCE(author_login, author_name) AS developer,
     -- 파생 컬럼
     DATE_TRUNC('day', author_date) AS commit_date,
     DATE_TRUNC('week', author_date) AS commit_week,

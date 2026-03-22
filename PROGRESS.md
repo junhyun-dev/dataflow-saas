@@ -5,14 +5,14 @@
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  🎯 현재 단계: Part 1 - E2E 하드코딩                        │
-│  📍 현재 위치: Session 3-4 완료 (Transform + Serve)           │
-│  📊 전체 진행률: Part 1: 4/5, Part 2: 0/5, Part 3: 0/3     │
+│  📍 현재 위치: Part 1 완료! E2E 파이프라인 관통              │
+│  📊 전체 진행률: Part 1: 5/5, Part 2: 0/5, Part 3: 0/3     │
 │                                                             │
-│  Part 1 ████████░░░░░░░░░░░░ 80%  (E2E 하드코딩)           │
+│  Part 1 ████████████████████ 100% (E2E 하드코딩) ✅         │
 │  Part 2 ░░░░░░░░░░░░░░░░░░░░ 0%   (Airflow + 확장)         │
 │  Part 3 ░░░░░░░░░░░░░░░░░░░░ 0%   (운영 품질)              │
 │                                                             │
-│  다음 할 일: Session 5 — E2E 수동 실행 → 문제 발견           │
+│  다음 할 일: Session 6-7 — Airflow DAG 오케스트레이션        │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -60,8 +60,8 @@ Collect → Load → Transform(SQL) → Serve(API)
 | **S2** | E2E: Collect → Load | ✅ 완료 (2026-03-22) |
 | **S3** | E2E: Transform (SQL 모델) | ✅ 완료 (2026-03-22) |
 | **S4** | E2E: Serve (FastAPI) | ✅ 완료 (2026-03-22) |
-| **S5** | E2E 수동 실행 → 문제 발견 | ⬜ 다음 |
-| S6-7 | Airflow DAG | ⬜ |
+| **S5** | E2E 수동 실행 → 문제 발견 | ✅ 완료 (2026-03-22) |
+| **S6-7** | Airflow DAG | ⬜ 다음 |
 | S8 | Config-driven 리팩토링 | ⬜ |
 | S9-10 | SQL 모델 확장 + 증분 처리 | ⬜ |
 | S11 | Data Quality | ⬜ |
@@ -125,6 +125,12 @@ Collect → Load → Transform(SQL) → Serve(API)
   - `GET /api/v1/tables`: 테이블 목록 + 행 수
   - E2E 최초 관통 완료: Collect → Load → Transform → Serve
 
+- [x] Session 5: E2E 수동 실행 → 문제 발견/수정
+  - 문제 1: PK 중복 크래시 → `insert_or_ignore` 구현 (멱등성)
+  - 문제 2: commits↔PRs JOIN 안됨 → `author_login` 필드 추가
+  - 멀티 repo 테스트: pallets/flask (commits 200 + PRs 200)
+  - FULL JOIN 정상 매칭 확인 (davidism: commits+PRs 합산)
+
 ---
 
 ## 변경 이력
@@ -137,3 +143,4 @@ Collect → Load → Transform(SQL) → Serve(API)
 | 2026-03-21 | Session 1 완료: 아키텍처 재설계 (ADR 005), LEARNING_PLAN 재편 |
 | 2026-03-22 | Session 2 완료: Collect→Load 연결, raw 스키마 재설계, E2E 스크립트 |
 | 2026-03-22 | Session 3-4 완료: Transform SQL 모델 + FastAPI Serve → E2E 관통 |
+| 2026-03-22 | Session 5 완료: 멱등성(insert_or_ignore) + 식별자 통합(author_login) |

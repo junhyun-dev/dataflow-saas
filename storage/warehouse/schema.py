@@ -73,9 +73,11 @@ RAW_COMMITS_SCHEMA = TableSchema(
         Column("message", "VARCHAR"),
         Column("author_name", "VARCHAR"),
         Column("author_email", "VARCHAR"),
+        Column("author_login", "VARCHAR"),  # GitHub username (PR author와 JOIN용)
         Column("author_date", "TIMESTAMP"),
         Column("committer_name", "VARCHAR"),
         Column("committer_email", "VARCHAR"),
+        Column("committer_login", "VARCHAR"),
         Column("committer_date", "TIMESTAMP"),
         Column("url", "VARCHAR"),
         Column("parents", "JSON"),  # ["sha1", "sha2"]
