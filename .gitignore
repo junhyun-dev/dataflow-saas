@@ -34,3 +34,11 @@ logs/
 *.pem
 *.key
 credentials.json
+
+# Pipeline output (collected data, DuckDB files)
+output/
+data/
+
+# AI prompts/responses
+.ai_ask_gemini.md
+.ai_gemini_response.md

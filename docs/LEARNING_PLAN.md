@@ -18,14 +18,15 @@
 - **학습 포인트**: Medallion Architecture, dbt 패턴, 회사 DO/DON'T 분석
 - [x] 완료 (2026-03-21)
 
-### Session 2: E2E 하드코딩 — Collect → Load
+### Session 2: E2E 하드코딩 — Collect → Load ✅
 - **타입**: Build
 - **범위**: GitHubCollector 출력 → DuckDB raw 테이블 적재
 - **SKILL-TREE**: ETL/ELT 설계, 스키마 설계
 - **핵심 질문**: "JSON을 어떻게 flatten해서 테이블로 넣을까? 메타데이터는?"
-- **산출물**: `raw_commits`, `raw_issues`, `raw_prs` 테이블 생성 + 데이터 적재 코드
+- **산출물**: `raw_commits`, `raw_pull_requests` 스키마 + `GitHubLoader` + E2E 스크립트
 - **회사 DON'T**: EAV 안 씀 — 소스별 명시적 스키마
-- [ ] 완료
+- **학습 포인트**: collector 출력↔스키마 1:1 매칭, DuckDB JSON 타입, TIMESTAMP 자동 캐스팅
+- [x] 완료 (2026-03-22)
 
 ### Session 3: E2E 하드코딩 — Transform (SQL 모델)
 - **타입**: Build

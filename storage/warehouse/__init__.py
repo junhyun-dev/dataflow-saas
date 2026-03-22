@@ -20,7 +20,13 @@ from .exceptions import (
     TableCreationError,
     InsertionError,
 )
-from .schema import Column, TableSchema, DuckDBType
+from .schema import (
+    Column,
+    TableSchema,
+    DuckDBType,
+    RAW_COMMITS_SCHEMA,
+    RAW_PULL_REQUESTS_SCHEMA,
+)
 from .results import InsertResult, QueryResult
 
 __all__ = [
@@ -31,6 +37,8 @@ __all__ = [
     "Column",
     "TableSchema",
     "DuckDBType",
+    "RAW_COMMITS_SCHEMA",
+    "RAW_PULL_REQUESTS_SCHEMA",
     # Results
     "InsertResult",
     "QueryResult",

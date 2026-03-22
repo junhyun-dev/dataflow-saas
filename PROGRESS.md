@@ -5,14 +5,14 @@
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  🎯 현재 단계: Part 1 - E2E 하드코딩                        │
-│  📍 현재 위치: Session 1 완료 (아키텍처 재설계)               │
-│  📊 전체 진행률: Part 1: 1/5, Part 2: 0/5, Part 3: 0/3     │
+│  📍 현재 위치: Session 2 완료 (Collect → Load)               │
+│  📊 전체 진행률: Part 1: 2/5, Part 2: 0/5, Part 3: 0/3     │
 │                                                             │
-│  Part 1 ██░░░░░░░░░░░░░░░░░░ 20%  (E2E 하드코딩)           │
+│  Part 1 ████░░░░░░░░░░░░░░░░ 40%  (E2E 하드코딩)           │
 │  Part 2 ░░░░░░░░░░░░░░░░░░░░ 0%   (Airflow + 확장)         │
 │  Part 3 ░░░░░░░░░░░░░░░░░░░░ 0%   (운영 품질)              │
 │                                                             │
-│  다음 할 일: Session 2 — Collect → Load 연결                 │
+│  다음 할 일: Session 3 — Transform (SQL 모델)                │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -24,7 +24,7 @@
 4단계로 시작, 진화형 아키텍처:
 
 Collect → Load → Transform(SQL) → Serve(API)
-  ✅       🔲       🔲              🔲
+  ✅       ✅       🔲              🔲
 
 구현 순서:
 1. E2E 하드코딩 (commits → DuckDB → mart → API)  ← 지금 여기
@@ -42,7 +42,9 @@ Collect → Load → Transform(SQL) → Serve(API)
 |---------|------|------|
 | ingestion/collector | ✅ 동작 | GitHubCollector, 테스트 12개 |
 | transform/converter | ✅ 동작 | Excel→Parquet, 테스트 5개 |
-| storage/warehouse | ✅ 동작 | DuckDB, Context Manager |
+| storage/warehouse | ✅ 동작 | DuckDB, raw 스키마 재설계 완료 |
+| pipeline/github_loader | ✅ 동작 | JSON→DuckDB 적재, 메타데이터 |
+| pipeline/run_collect_load | ✅ 동작 | E2E 원커맨드 실행 스크립트 |
 
 ---
 
@@ -51,8 +53,8 @@ Collect → Load → Transform(SQL) → Serve(API)
 | Session | 주제 | 상태 |
 |---------|------|------|
 | **S1** | 전체 아키텍처 + 기존 코드 리뷰 | ✅ 완료 (2026-03-21) |
-| **S2** | E2E: Collect → Load | ⬜ 다음 |
-| S3 | E2E: Transform (SQL 모델) | ⬜ |
+| **S2** | E2E: Collect → Load | ✅ 완료 (2026-03-22) |
+| **S3** | E2E: Transform (SQL 모델) | ⬜ 다음 |
 | S4 | E2E: Serve (FastAPI) | ⬜ |
 | S5 | E2E 수동 실행 → 문제 발견 | ⬜ |
 | S6-7 | Airflow DAG | ⬜ |
@@ -94,6 +96,20 @@ Collect → Load → Transform(SQL) → Serve(API)
 - "만들면서 필요할 때 분리" 진화형 아키텍처 채택
 - 회사 EAV 패턴 대신 소스별 명시적 스키마
 
+### Week 3 (2026-03-22)
+
+**완료:**
+- [x] Session 2: Collect → Load 연결
+  - raw 스키마 재설계: collector 출력과 1:1 매칭 (기존 스키마는 필드 누락/불일치)
+  - `pipeline/github_loader.py`: JSON→DuckDB 적재 + 메타데이터(repo_owner, loaded_at)
+  - `pipeline/run_collect_load.py`: E2E 원커맨드 실행
+  - 실행 검증: 2건 커밋 수집→적재, TIMESTAMP/JSON 타입 정상
+
+**핵심 학습:**
+- DuckDB JSON 타입: Python list → json.dumps() 필요
+- Collector 출력과 raw 스키마 1:1 매칭이 중요 (이전 스키마는 임의로 만들어서 불일치)
+- TIMESTAMP 자동 캐스팅: ISO 8601 문자열 → DuckDB가 알아서 변환
+
 ---
 
 ## 변경 이력
@@ -104,3 +120,4 @@ Collect → Load → Transform(SQL) → Serve(API)
 | 2026-03-02 | transform/converter 기본 완료 |
 | 2026-03-03 | ingestion/collector 기본 완료, 통합 테스트, ADR 3개 |
 | 2026-03-21 | Session 1 완료: 아키텍처 재설계 (ADR 005), LEARNING_PLAN 재편 |
+| 2026-03-22 | Session 2 완료: Collect→Load 연결, raw 스키마 재설계, E2E 스크립트 |

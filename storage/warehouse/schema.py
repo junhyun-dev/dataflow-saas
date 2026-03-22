@@ -59,49 +59,53 @@ class TableSchema:
         return [col.name for col in self.columns]
 
 
-# 미리 정의된 스키마 (GitHub 데이터용)
-GITHUB_COMMITS_SCHEMA = TableSchema(
-    name="github_commits",
+# === Raw Layer 스키마 ===
+# GitHubCollector._normalize_*() 출력과 1:1 매칭
+# 날짜: TIMESTAMP으로 즉시 변환 (ADR 005 DON'T #4)
+# 리스트 필드: JSON 타입 (parents, labels)
+# 메타데이터: repo_owner, repo_name, loaded_at
+
+RAW_COMMITS_SCHEMA = TableSchema(
+    name="raw_commits",
     columns=[
+        # Collector 출력 필드
         Column("sha", "VARCHAR", primary_key=True),
         Column("message", "VARCHAR"),
         Column("author_name", "VARCHAR"),
         Column("author_email", "VARCHAR"),
-        Column("committed_at", "TIMESTAMP"),
-        Column("repo_owner", "VARCHAR"),
-        Column("repo_name", "VARCHAR"),
+        Column("author_date", "TIMESTAMP"),
+        Column("committer_name", "VARCHAR"),
+        Column("committer_email", "VARCHAR"),
+        Column("committer_date", "TIMESTAMP"),
+        Column("url", "VARCHAR"),
+        Column("parents", "JSON"),  # ["sha1", "sha2"]
+        # 메타데이터
+        Column("repo_owner", "VARCHAR", nullable=False),
+        Column("repo_name", "VARCHAR", nullable=False),
+        Column("loaded_at", "TIMESTAMP", nullable=False),
     ],
 )
 
-GITHUB_ISSUES_SCHEMA = TableSchema(
-    name="github_issues",
+RAW_PULL_REQUESTS_SCHEMA = TableSchema(
+    name="raw_pull_requests",
     columns=[
-        Column("id", "BIGINT", primary_key=True),
-        Column("number", "INTEGER"),
+        # Collector 출력 필드
+        Column("number", "INTEGER", primary_key=True),
         Column("title", "VARCHAR"),
+        Column("body", "VARCHAR"),
         Column("state", "VARCHAR"),
-        Column("user_login", "VARCHAR"),
+        Column("author", "VARCHAR"),
+        Column("head_ref", "VARCHAR"),
+        Column("base_ref", "VARCHAR"),
+        Column("labels", "JSON"),  # ["bug", "feature"]
         Column("created_at", "TIMESTAMP"),
         Column("updated_at", "TIMESTAMP"),
         Column("closed_at", "TIMESTAMP"),
-        Column("repo_owner", "VARCHAR"),
-        Column("repo_name", "VARCHAR"),
-    ],
-)
-
-GITHUB_PULL_REQUESTS_SCHEMA = TableSchema(
-    name="github_pull_requests",
-    columns=[
-        Column("id", "BIGINT", primary_key=True),
-        Column("number", "INTEGER"),
-        Column("title", "VARCHAR"),
-        Column("state", "VARCHAR"),
-        Column("user_login", "VARCHAR"),
-        Column("created_at", "TIMESTAMP"),
-        Column("updated_at", "TIMESTAMP"),
         Column("merged_at", "TIMESTAMP"),
-        Column("closed_at", "TIMESTAMP"),
-        Column("repo_owner", "VARCHAR"),
-        Column("repo_name", "VARCHAR"),
+        Column("url", "VARCHAR"),
+        # 메타데이터
+        Column("repo_owner", "VARCHAR", nullable=False),
+        Column("repo_name", "VARCHAR", nullable=False),
+        Column("loaded_at", "TIMESTAMP", nullable=False),
     ],
 )
